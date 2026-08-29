@@ -1,0 +1,31 @@
+<% content_for :title, "Todo" %>
+
+<main class="container">
+  <h1>Todo</h1>
+
+  <%= form_with model: @task, url: tasks_path, class: "new-task" do |f| %>
+    <%= f.text_field :title, placeholder: "やること", autofocus: true, autocomplete: "off" %>
+    <%= f.submit "追加" %>
+  <% end %>
+
+  <% if @task.errors.any? %>
+    <p class="error">タイトルを入力してください</p>
+  <% end %>
+
+  <ul class="tasks">
+    <% @tasks.each do |task| %>
+      <li class="task <%= "is-completed" if task.completed? %>">
+        <%= button_to toggle_task_path(task), method: :patch, class: "toggle" do %>
+          <%= task.completed? ? "☑" : "☐" %>
+        <% end %>
+        <span class="title"><%= task.title %></span>
+        <%= button_to "削除", task_path(task), method: :delete, class: "delete",
+              form: { data: { turbo_confirm: "削除しますか？" } } %>
+      </li>
+    <% end %>
+
+    <% if @tasks.empty? %>
+      <li class="empty">タスクはありません</li>
+    <% end %>
+  </ul>
+</main>

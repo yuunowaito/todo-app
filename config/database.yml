@@ -1,0 +1,23 @@
+# PostgreSQL. Versions 9.3 and up are supported.
+#
+# In every environment the connection can be overridden with the DATABASE_URL
+# environment variable (docker-compose sets it locally, Render sets it in
+# production). When DATABASE_URL is present Rails merges it on top of the
+# values below.
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: todo_development
+
+test:
+  <<: *default
+  database: todo_test
+
+production:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>

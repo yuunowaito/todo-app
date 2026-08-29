@@ -1,0 +1,7 @@
+write_code:
+  title: コードを書く
+  completed: false
+
+buy_milk:
+  title: 牛乳を買う
+  completed: true
