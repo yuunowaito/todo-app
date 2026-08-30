@@ -40,10 +40,23 @@ docker compose run --rm web bin/brakeman -q --no-pager
 docker compose run --rm web bin/rails <command>
 ```
 
+## 実装状況
+
+4機能すべて実装・テスト済み（`main` に push 済み）。単一画面（`tasks#index`）で完結。
+
+| 機能 | 実装 |
+| --- | --- |
+| 一覧 | `TasksController#index` が `Task.ordered`。0件時はビューで「タスクはありません」 |
+| 追加 | `#create`。`form_with model: @task`。空タイトルは `render :index, status: :unprocessable_entity` |
+| 完了トグル | `#toggle`（`PATCH /tasks/:id/toggle`）。ビューは `button_to`。完了は `.is-completed` で取り消し線 |
+| 削除 | `#destroy`。`button_to` に `data: { turbo_confirm: "削除しますか？" }` |
+
 ## 構成メモ
 
-- `Task` モデル: `title`（必須）, `completed`（boolean, デフォルト false）
+- `Task` モデル: `title`（必須）, `completed`（boolean, デフォルト false）。`scope :ordered` は `order(:completed, created_at: :desc)`（未完了が上、各グループ内は新しい順）
 - ルート: `root "tasks#index"` + `resources :tasks, only: [:index, :create, :destroy]` に `patch :toggle`（member）
+- スタイルは `app/assets/stylesheets/application.css` に直書き（`.task.is-completed .title { text-decoration: line-through }` など）
+- テスト: `test/models/task_test.rb`、`test/controllers/tasks_controller_test.rb`
 - `config/database.yml` の production は `DATABASE_URL` を参照
 - 本番の SSL リダイレクトから `/up`（ヘルスチェック）を除外済み
 
@@ -52,6 +65,7 @@ docker compose run --rm web bin/rails <command>
 - このディレクトリが独立した git リポジトリ（`main` ブランチ）。ホームディレクトリ `~` も
   コミットゼロの git リポジトリになっているため、git コマンドは必ずこのディレクトリ内で実行する。
 - author: `yuunowaito <nowaito45@gmail.com>`
+- リモート: `origin` = https://github.com/yuunowaito/todo-app.git
 
 ## デプロイ（Render）
 
